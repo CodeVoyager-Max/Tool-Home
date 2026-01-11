@@ -1,60 +1,60 @@
-<！doctype html> html>
- <超文本标记语言 朗="zh-CN">
- <头>
-     <元 字符集="UTF-8">
-     <元 姓名="视口" 内容="宽度=设备宽度，初始比例=1.0">
-     <标题>作息管理工具</标题>
-     <风格>
+<!DOCTYPE html>
+ <html lang="zh-CN">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>作息管理工具</title>
+     <style>
          /* 弹窗样式 */
-         .模态的 {
-             显示: 没有一个;
-             位置: 确定的;
-             顶端: 0;
-             左: 0;
-             宽度: 100%;
-             高度: 100%;
-             背景色: RGBA(0, 0, 0, 0.5);
-             justify-content: 中心;
-             对齐项目: 中心;
+         .modal {
+             display: none;
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-color: rgba(0, 0, 0, 0.5);
+             justify-content: center;
+             align-items: center;
          }
-         .模态内容 {
-             背景色: 白色的;
-             填充: 20PX;
-             边界半径: 8PX;
-             宽度: 300PX;
+         .modal-content {
+             background-color: white;
+             padding: 20px;
+             border-radius: 8px;
+             width: 300px;
          }
-         .关闭 {
-             漂浮: 正确的;
-             字体大小: 20PX;
-             光标: 指针;
+         .close {
+             float: right;
+             font-size: 20px;
+             cursor: pointer;
          }
          /* 表单样式 */
-         .窗体组 {
-             边缘: 15PX 0;
+         .form-group {
+             margin: 15px 0;
          }
-         标签 {
-             显示: 块;
-             边缘: 5PX 0;
+         label {
+             display: block;
+             margin: 5px 0;
          }
-         输入, 选择 {
-             宽度: 100%;
-             填充: 8PX;
-             箱体尺寸: 边框框;
-             边境: 1PX 固体#ccc；
-             边界半径: 4PX;
+         input, select {
+             width: 100%;
+             padding: 8px;
+             box-sizing: border-box;
+             border: 1px solid #ccc;
+             border-radius: 4px;
          }
-         按钮 {
-             宽度: 100%;
-             填充: 10PX;
-             背景色：#007bff；
-             颜色: 白色的;
-             边境: 没有一个;
-             边界半径: 4PX;
-             光标: 指针;
-             字体大小: 16PX;
+         button {
+             width: 100%;
+             padding: 10px;
+             background-color: #007bff;
+             color: white;
+             border: none;
+             border-radius: 4px;
+             cursor: pointer;
+             font-size: 16px;
          }
-         按钮:盘旋 {
-             背景色：#0056b3；
+         button:hover {
+             background-color: #0056b3;
          }/* 作息项列表样式 */
          #scheduleList {
              margin: 20px 0;
@@ -93,7 +93,17 @@
              background-color: #dc3545;
              font-size: 14px;
          }
-         .delete-btn:hover {background-color: #c82333;
+         .edit-btn:hover {
+             background-color: #ffca2c;
+         }
+         .delete-btn {
+             width: 60px;
+             padding: 5px;
+             background-color: #dc3545;
+             font-size: 14px;
+         }
+         .delete-btn:hover {
+             background-color: #c82333;
          }
          /* 排序提示样式 */
          .sort-tip {
@@ -161,9 +171,6 @@
          // 渲染作息项列表（含排序）
          function renderScheduleList() {
              let scheduleItems = getScheduleData();
-             // 渲染作息项列表（含排序）
-         function renderScheduleList() {
-             let scheduleItems = getScheduleData();
              // 排序后再渲染
              scheduleItems = sortScheduleByTime(scheduleItems);
              scheduleList.innerHTML = ''; // 清空列表
@@ -183,6 +190,7 @@
                  scheduleList.appendChild(listItem);
              });
              // 绑定编辑和删除事件
+             bind// 绑定编辑和删除事件
              bindEditEvents();
              bindDeleteEvents();
          }
@@ -236,7 +244,6 @@
              if (e.target === modal) {
                  modal.style.display = 'none';
              }
-         });
          });
          // 提交表单：新增或编辑
          scheduleForm.addEventListener('submit', (e) => {
