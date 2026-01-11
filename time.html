@@ -36,7 +36,7 @@
              display: block;
              margin: 5px 0;
          }
-         input, select {
+         input {
              width: 100%;
              padding: 8px;
              box-sizing: border-box;
@@ -55,7 +55,8 @@
          }
          button:hover {
              background-color: #0056b3;
-         }/* 作息项列表样式 */
+         }
+         /* 作息项列表样式 */
          #scheduleList {
              margin: 20px 0;
              padding: 0;
@@ -93,15 +94,6 @@
              background-color: #dc3545;
              font-size: 14px;
          }
-         .edit-btn:hover {
-             background-color: #ffca2c;
-         }
-         .delete-btn {
-             width: 60px;
-             padding: 5px;
-             background-color: #dc3545;
-             font-size: 14px;
-         }
          .delete-btn:hover {
              background-color: #c82333;
          }
@@ -109,7 +101,6 @@
          .sort-tip {
              color: #6c757d;
              font-size: 14px;
-             margin: 10px 0;
          }
      </style>
  </head>
@@ -117,13 +108,14 @@
      <h1>作息管理工具</h1>
      <p class="sort-tip">✅ 作息项已按 <b>开始时间</b> 自动排序</p>
      <button id="addBtn">添加作息项</button>
-     <ul id="scheduleList"></ul><!-- 添加/编辑作息项弹窗 -->
+     <ul id="scheduleList"></ul>
+     <!-- 添加/编辑作息项弹窗 -->
      <div id="modal" class="modal">
          <div class="modal-content">
              <span class="close">&times;</span>
              <h2 id="modalTitle">添加作息项</h2>
              <form id="scheduleForm">
-                 <input type="hidden" id="editIndex"> <!-- 存储编辑项的索引 -->
+                 <input type="hidden" id="editIndex">
                  <div class="form-group">
                      <label for="title">标题</label>
                      <input type="text" id="title" placeholder="例如：睡眠、工作" required>
@@ -150,30 +142,28 @@
          const editIndex = document.getElementById('editIndex');
          const titleInput = document.getElementById('title');
          const startTimeInput = document.getElementById('startTime');
-         const endTimeInput = document.getElementById('endTime');// 从本地存储获取作息项数据
+         const endTimeInput = document.getElementById('endTime');
+         // 本地存储操作
          function getScheduleData() {
              const data = localStorage.getItem('scheduleItems');
              return data ? JSON.parse(data) : [];
          }
-         // 保存作息项数据到本地存储
          function saveScheduleData(data) {
              localStorage.setItem('scheduleItems', JSON.stringify(data));
          }
-         // 按开始时间排序：核心排序逻辑
+         // 按开始时间排序
          function sortScheduleByTime(scheduleItems) {
              return scheduleItems.sort((a, b) => {
-                 // 将时间字符串转为分钟数比较（如 "08:30" → 8*60+30=510）
                  const timeA = a.startTime.split(':').reduce((h, m) => h*60 + parseInt(m));
                  const timeB = b.startTime.split(':').reduce((h, m) => h*60 + parseInt(m));
-                 return timeA - timeB; // 升序排列（早→晚）
+                 return timeA - timeB;
              });
          }
-         // 渲染作息项列表（含排序）
+         // 渲染列表
          function renderScheduleList() {
              let scheduleItems = getScheduleData();
-             // 排序后再渲染
              scheduleItems = sortScheduleByTime(scheduleItems);
-             scheduleList.innerHTML = ''; // 清空列表
+             scheduleList.innerHTML = '';
              scheduleItems.forEach((item, index) => {
                  const listItem = document.createElement('li');
                  listItem.className = 'schedule-item';
@@ -189,65 +179,53 @@
                  `;
                  scheduleList.appendChild(listItem);
              });
-             // 绑定编辑和删除事件
-             bind// 绑定编辑和删除事件
              bindEditEvents();
              bindDeleteEvents();
          }
-         // 绑定编辑按钮事件
+         // 编辑事件绑定
          function bindEditEvents() {
-             const editBtns = document.querySelectorAll('.edit-btn');
-             editBtns.forEach(btn => {
+             document.querySelectorAll('.edit-btn').forEach(btn => {
                  btn.addEventListener('click', () => {
                      const index = parseInt(btn.getAttribute('data-index'));
                      let scheduleItems = getScheduleData();
-                     scheduleItems = sortScheduleByTime(scheduleItems); // 排序后获取正确索引
+                     scheduleItems = sortScheduleByTime(scheduleItems);
                      const editItem = scheduleItems[index];
-                     // 填充表单数据
+                     
                      modalTitle.textContent = '编辑作息项';
                      editIndex.value = index;
                      titleInput.value = editItem.title;
                      startTimeInput.value = editItem.startTime;
                      endTimeInput.value = editItem.endTime;
-                     // 打开弹窗
                      modal.style.display = 'flex';
                  });
              });
          }
-         // 绑定删除按钮事件
+         // 删除事件绑定
          function bindDeleteEvents() {
-             const deleteBtns = document.querySelectorAll('.delete-btn');
-             deleteBtns.forEach(btn => {
+             document.querySelectorAll('.delete-btn').forEach(btn => {
                  btn.addEventListener('click', () => {
                      const index = parseInt(btn.getAttribute('data-index'));
                      let scheduleItems = getScheduleData();
-                     scheduleItems = sortScheduleByTime(scheduleItems); // 排序后获取正确索引
-                     scheduleItems.splice(index, 1); // 删除对应项
-                     saveScheduleData(scheduleItems); // 保存到本地存储
-                     renderScheduleList(); // 重新渲染列表
+                     scheduleItems = sortScheduleByTime(scheduleItems);
+                     scheduleItems.splice(index, 1);
+                     saveScheduleData(scheduleItems);
+                     renderScheduleList();
                  });
              });
          }
          // 打开添加弹窗
          addBtn.addEventListener('click', () => {
              modalTitle.textContent = '添加作息项';
-             editIndex.value = '-1'; // 标记为新增
-             scheduleForm.reset(); // 清空表单
+             editIndex.value = '-1';
+             scheduleForm.reset();
              modal.style.display = 'flex';
          });
          // 关闭弹窗
-         closeBtn.addEventListener('click', () => {
-             modal.style.display = 'none';
-         });
-         // 点击弹窗外部关闭
-         window.addEventListener('click', (e) => {
-             if (e.target === modal) {
-                 modal.style.display = 'none';
-             }
-         });
-         // 提交表单：新增或编辑
+         closeBtn.addEventListener('click', () => modal.style.display = 'none');
+         window.addEventListener('click', (e) => e.target === modal && (modal.style.display = 'none'));
+         // 提交表单（含重复项校验）
          scheduleForm.addEventListener('submit', (e) => {
-             e.preventDefault(); // 阻止表单默认提交
+             e.preventDefault();
              const index = parseInt(editIndex.value);
              const newItem = {
                  title: titleInput.value,
@@ -255,21 +233,25 @@
                  endTime: endTimeInput.value
              };
              let scheduleItems = getScheduleData();
+             // 新增时校验重复项
              if (index === -1) {
-                 // 新增：添加到数组
+                 const isDuplicate = scheduleItems.some(item => 
+                     item.title === newItem.title && item.startTime === newItem.startTime && item.endTime === newItem.endTime
+                 );
+                 if (isDuplicate) {
+                     alert('已存在相同标题和时间的作息项，请勿重复添加！');
+                     return;
+                 }
                  scheduleItems.push(newItem);
              } else {
-                 // 编辑：先排序再替换（确保索引正确）
                  scheduleItems = sortScheduleByTime(scheduleItems);
                  scheduleItems[index] = newItem;
              }
-             // 保存并重新渲染
              saveScheduleData(scheduleItems);
              renderScheduleList();
-             // 关闭弹窗
              modal.style.display = 'none';
          });
-         // 页面加载时渲染列表
+         // 页面加载渲染
          window.addEventListener('DOMContentLoaded', renderScheduleList);
      </script>
  </body>
