@@ -9,11 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
     <style type="text/tailwindcss">
         @layer utilities {
-            /* 调整网格行高，确保晚间时段不挤压 */
             .time-grid { grid-template-rows: repeat(24, minmax(20px, 1fr)); }
             .time-label { @apply text-xs text-gray-500 flex items-center justify-center h-6; }
             .time-slot { @apply border-t border-gray-200 relative; }
-            /* 作息块调整左右边距，增加显示空间 */
             .time-block { 
                 @apply absolute left-2 right-2 rounded-md shadow cursor-pointer overflow-hidden z-10;
                 max-height: calc(100% - 4px);
@@ -22,36 +20,81 @@
             .time-block:hover { @apply shadow-md z-20; }
         }
     </style>
+    <style>
+        /* 统计模块样式 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .stat-item label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        .stat-item value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .stat-item span {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-left: 4px;
+        }
+        /* 图表容器样式 */
+        .chart-container {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            height: 220px;
+        }
+        /* 响应式适配 */
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 font-sans min-h-screen pb-20">
     <nav class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center">
-                <i class="fa fa-calendar-check-o text-2xl text-blue-500 mr-2"></i>
+                <<i class="fa fa-calendar-check-o text-2xl text-blue-500 mr-2"></</i>
                 <span class="text-xl font-bold text-gray-800">极简作息管理</span>
             </div>
             <span id="current-date" class="text-gray-600 max-w-[200px] truncate"></span>
         </div>
     </nav>
-
     <div class="bg-white shadow-sm sticky top-14 z-40">
         <div class="max-w-6xl mx-auto px-4 py-2 flex justify-center items-center gap-4">
             <button id="prev-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <i class="fa fa-chevron-left text-gray-600"></i>
+                <<i class="fa fa-chevron-left text-gray-600"></</i>
             </button>
             <button id="today-btn" class="px-4 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors">
                 今日
             </button>
             <button id="next-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <i class="fa fa-chevron-right text-gray-600"></i>
+                <<i class="fa fa-chevron-right text-gray-600"></</i>
             </button>
         </div>
     </div>
-
     <div class="max-w-6xl mx-auto px-4 py-8">
         <div class="flex flex-col lg:flex-row gap-8">
+            <!-- 时间轴区域 -->
             <div class="w-full lg:w-[calc(75%-2rem)]">
-                <!-- 增加时间轴高度，确保晚间时段有足够显示空间 -->
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden h-[600px]">
                     <div class="p-3 h-full overflow-hidden">
                         <div class="flex h-full">
@@ -65,57 +108,58 @@
                     </div>
                 </div>
             </div>
-
+            <!-- 功能侧边栏 -->
             <div class="w-full lg:w-[calc(25%-2rem)] space-y-5">
                 <button id="add-btn" class="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center">
-                    <i class="fa fa-plus mr-2"></i> 添加作息
+                    <<i class="fa fa-plus mr-2"></</i> 添加作息
                 </button>
-
+                <!-- 图表容器（新增） -->
+                <div class="chart-container">
+                    <canvas id="time-chart"></canvas>
+                </div>
+                <!-- 统计模块（修复ID） -->
                 <div class="stats-grid">
-     <div class="stat-item">
-         <label>睡眠</label>
-         <value id="sleepStat">0.0</value>
-         <span>/小时</span>
-     </div>
-     <div class="stat-item">
-         <label>工作</label>
-         <value id="workStat">0.0</value>
-         <span>/小时</span>
-     </div>
-     <div class="stat-item">
-         <label>学习</label>
-         <value id="studyStat">0.0</value>
-         <span>/小时</span>
-     </div>
-     <div class="stat-item">
-         <label>运动</label>
-         <value id="sportStat">0.0</value>
-         <span>/小时</span>
-     </div>
-     <div class="stat-item">
-         <label>休闲</label>
-         <value id="leisureStat">0.0</value>
-         <span>/小时</span>
-     </div>
-     <div class="stat-item">
-         <label>其他</label>
-         <value id="otherStat">0.0</value>
-         <span>/小时</span>
-     </div>
- </div>
-                        </div>
+                    <div class="stat-item">
+                        <label>睡眠</label>
+                        <value id="sleep-time">0.0</value>
+                        <span>/小时</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>工作</label>
+                        <value id="work-time">0.0</value>
+                        <span>/小时</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>学习</label>
+                        <value id="study-time">0.0</value>
+                        <span>/小时</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>运动</label>
+                        <value id="exercise-time">0.0</value>
+                        <span>/小时</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>休闲</label>
+                        <value id="leisure-time">0.0</value>
+                        <span>/小时</span>
+                    </div>
+                    <div class="stat-item">
+                        <label>其他</label>
+                        <value id="other-time">0.0</value>
+                        <span>/小时</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <!-- 弹窗表单 -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-5">
             <div class="flex justify-between items-center mb-4">
                 <h3 id="modal-title" class="text-xl font-bold text-gray-800">添加作息项</h3>
                 <button id="close-modal" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
-                    <i class="fa fa-times"></i>
+                    <<i class="fa fa-times"></</i>
                 </button>
             </div>
             <form id="form">
@@ -162,7 +206,7 @@
         let schedules = {};
         let currentEditId = null;
         let timeChart = null;
-
+        // 类别配置（颜色+名称映射）
         const categories = {
             sleep: { color: '#3B82F6', name: '睡眠' },
             work: { color: '#F97316', name: '工作' },
@@ -172,6 +216,7 @@
             other: { color: '#6B7280', name: '其他' }
         };
 
+        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
             renderTimeLabels();
@@ -182,39 +227,48 @@
             bindEvents();
         });
 
+        // 生成唯一ID（用于作息项标识）
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
 
+        // 从本地存储加载数据
         function loadData() {
             const saved = localStorage.getItem('simple-schedule');
             if (saved) {
                 schedules = JSON.parse(saved);
             } else {
+                // 初始化默认数据
                 const today = formatDate(currentDate);
                 schedules[today] = [
                     { id: generateId(), title: '睡眠', start: '23:00', end: '07:00', category: 'sleep' },
                     { id: generateId(), title: '工作', start: '09:00', end: '18:00', category: 'work' },
                     { id: generateId(), title: '运动', start: '18:30', end: '19:30', category: 'exercise' },
-                    { id: generateId(), title: '休闲', start: '20:00', end: '22:00', category: 'leisure' }
+                    { id: generateId(), title: '休闲', start: '20:00', end: '22:00', category: 'leisure' },
+                    { id: generateId(), title: '学习', start: '19:30', end: '20:30', category: 'study' },
+                    { id: generateId(), title: '通勤', start: '08:30', end: '09:00', category: 'other' }
                 ];
                 saveData();
             }
         }
 
+        // 保存数据到本地存储
         function saveData() {
             localStorage.setItem('simple-schedule', JSON.stringify(schedules));
         }
 
+        // 格式化日期为YYYY-MM-DD
         function formatDate(date) {
             return date.toISOString().split('T')[0];
         }
 
+        // 更新顶部日期显示
         function updateDateDisplay() {
             const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
             document.getElementById('current-date').textContent = currentDate.toLocaleDateString('zh-CN', options);
         }
 
+        // 渲染左侧时间标签（00:00-23:00）
         function renderTimeLabels() {
             const container = document.getElementById('time-labels');
             container.innerHTML = '';
@@ -226,14 +280,14 @@
             }
         }
 
-        // 核心修复：优化跨天作息块的显示逻辑，确保22:00-24:00部分完整显示
+        // 渲染时间轴上的作息块
         function renderSchedule() {
             const dateKey = formatDate(currentDate);
             const list = schedules[dateKey] || [];
             const container = document.getElementById('time-axis');
             container.innerHTML = '';
 
-            // 添加24小时时间槽
+            // 创建24小时时间槽
             for (let i = 0; i < 24; i++) {
                 const slot = document.createElement('div');
                 slot.className = 'time-slot';
@@ -241,12 +295,14 @@
                 container.appendChild(slot);
             }
 
+            // 渲染每个作息项
             list.forEach(item => {
                 const block = createScheduleBlock(item);
                 container.appendChild(block);
             });
         }
 
+        // 创建单个作息块元素（支持跨天显示）
         function createScheduleBlock(item) {
             const startParts = item.start.split(':').map(Number);
             const endParts = item.end.split(':').map(Number);
@@ -255,13 +311,14 @@
             const endHour = endParts[0];
             const endMin = endParts[1];
 
-            // 拆分跨天作息块：当天部分（如23:00-24:00）和次日部分（如00:00-07:00）
+            // 处理跨天作息（如23:00-07:00）
             if (endHour < startHour || (endHour === startHour && endMin < startMin)) {
-                // 当天显示的部分：从开始时间到24:00
+                // 当天显示部分（从开始时间到24:00）
                 const todayBlock = document.createElement('div');
                 todayBlock.className = 'time-block';
                 todayBlock.dataset.id = item.id + '-today';
-                // 计算当天部分的高度：(24*60 - 开始分钟数) / (24*60) * 100%
+                
+                // 计算位置和高度（基于分钟数占比）
                 const todayStartPercent = (startHour * 60 + startMin) / 1440 * 100;
                 const todayHeightPercent = (1440 - (startHour * 60 + startMin)) / 1440 * 100;
                 
@@ -277,11 +334,10 @@
                 todayBlock.addEventListener('click', () => openEditModal(item));
                 return todayBlock;
             } else {
-                // 非跨天作息块，正常计算
+                // 非跨天作息（正常显示）
                 const startMinutes = startHour * 60 + startMin;
                 const endMinutes = endHour * 60 + endMin;
                 const durationMinutes = endMinutes - startMinutes;
-
                 const startPercent = startMinutes / 1440 * 100;
                 const heightPercent = durationMinutes / 1440 * 100;
 
@@ -302,6 +358,7 @@
             }
         }
 
+        // 初始化饼图（统计可视化）
         function initChart() {
             const ctx = document.getElementById('time-chart').getContext('2d');
             timeChart = new Chart(ctx, {
@@ -311,45 +368,68 @@
                     datasets: [{
                         data: [0, 0, 0, 0, 0, 0],
                         backgroundColor: Object.values(categories).map(c => c.color),
-                        borderWidth: 0
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { padding: 15, font: { size: 11 } } }
-                    }
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                padding: 15, 
+                                font: { size: 11 },
+                                boxWidth: 12
+                            } 
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const hours = (value / 60).toFixed(1);
+                                    return `${context.label}: ${hours}小时`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
                 }
             });
         }
 
+        // 更新统计数据（修复闭合括号+ID匹配）
         function updateStats() {
             const dateKey = formatDate(currentDate);
             const list = schedules[dateKey] || [];
             const timeMap = { sleep:0, work:0, study:0, exercise:0, leisure:0, other:0 };
 
+            // 计算每个类别的总时长（分钟）
             list.forEach(item => {
                 const s = item.start.split(':').map(Number);
                 const e = item.end.split(':').map(Number);
                 let mins = (e[0] * 60 + e[1]) - (s[0] * 60 + s[1]);
-                if (mins < 0) mins += 1440;
+                if (mins < 0) mins += 1440; // 跨天情况补全1440分钟（24小时）
                 timeMap[item.category] += mins;
             });
 
+            // 更新饼图数据
             timeChart.data.datasets[0].data = Object.keys(timeMap).map(k => timeMap[k]);
             timeChart.update();
 
-            document.getElementById('sleep-time').textContent = `${(timeMap.sleep/60).toFixed(1)}小时`;
-            document.getElementById('work-time').textContent = `${(timeMap.work/60).toFixed(1)}小时`;
-            document.getElementById('exercise-time').textContent = `${(timeMap.exercise/60).toFixed(1)}小时`;
-            document.getElementById('leisure-time').textContent = `${(timeMap.leisure/60).toFixed(1)}小时`;
-            document.getElementById('study-time').textContent = `${(timeMap.study/60).toFixed(1)}小时`;
-            document.getElementById('other-time').textContent  = `${(timeMap.other/60).toFixed(1)}小时`;
+            // 更新统计数值显示（与HTML ID对应）
+            document.getElementById('sleep-time').textContent = `${(timeMap.sleep/60).toFixed(1)}`;
+            document.getElementById('work-time').textContent = `${(timeMap.work/60).toFixed(1)}`;
+            document.getElementById('study-time').textContent = `${(timeMap.study/60).toFixed(1)}`;
+            document.getElementById('exercise-time').textContent = `${(timeMap.exercise/60).toFixed(1)}`;
+            document.getElementById('leisure-time').textContent = `${(timeMap.leisure/60).toFixed(1)}`;
+            document.getElementById('other-time').textContent = `${(timeMap.other/60).toFixed(1)}`;
+        }
 
- 
-
+        // 绑定所有交互事件
         function bindEvents() {
+            // 日期切换
             document.getElementById('prev-date').addEventListener('click', () => changeDate(-1));
             document.getElementById('next-date').addEventListener('click', () => changeDate(1));
             document.getElementById('today-btn').addEventListener('click', () => {
@@ -359,12 +439,19 @@
                 updateStats();
             });
 
+            // 弹窗操作
             document.getElementById('add-btn').addEventListener('click', openAddModal);
             document.getElementById('close-modal').addEventListener('click', closeModal);
             document.getElementById('form').addEventListener('submit', saveItem);
             document.getElementById('delete-btn').addEventListener('click', deleteItem);
+
+            // 点击弹窗外部关闭
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modal')) closeModal();
+            });
         }
 
+        // 切换日期（前一天/后一天）
         function changeDate(direction) {
             currentDate.setDate(currentDate.getDate() + direction);
             updateDateDisplay();
@@ -372,6 +459,7 @@
             updateStats();
         }
 
+        // 打开添加作息弹窗
         function openAddModal() {
             currentEditId = null;
             document.getElementById('modal-title').textContent = '添加作息项';
@@ -379,8 +467,11 @@
             document.getElementById('form').reset();
             document.getElementById('delete-btn').classList.add('hidden');
             document.getElementById('modal').classList.remove('hidden');
+            // 自动聚焦标题输入框
+            document.getElementById('title').focus();
         }
 
+        // 打开编辑作息弹窗
         function openEditModal(item) {
             currentEditId = item.id;
             document.getElementById('modal-title').textContent = '编辑作息项';
@@ -393,10 +484,12 @@
             document.getElementById('modal').classList.remove('hidden');
         }
 
+        // 关闭弹窗
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
         }
 
+        // 保存作息项（新增/编辑）
         function saveItem(e) {
             e.preventDefault();
             const title = document.getElementById('title').value.trim();
@@ -404,31 +497,41 @@
             const end = document.getElementById('end-time').value;
             const category = document.getElementById('category').value;
 
-            if (!title || !start || !end) {
-                alert('请填写完整信息');
+            // 表单验证
+            if (!title) {
+                alert('请填写作息标题');
+                document.getElementById('title').focus();
+                return;
+            }
+            if (!start || !end) {
+                alert('请选择开始和结束时间');
                 return;
             }
 
             const dateKey = formatDate(currentDate);
             if (!schedules[dateKey]) schedules[dateKey] = [];
 
+            // 编辑已有项
             if (currentEditId) {
                 const index = schedules[dateKey].findIndex(i => i.id === currentEditId);
                 if (index !== -1) {
                     schedules[dateKey][index] = { id: currentEditId, title, start, end, category };
                 }
             } else {
+                // 新增项
                 schedules[dateKey].push({ id: generateId(), title, start, end, category });
             }
 
+            // 保存数据并刷新界面
             saveData();
             renderSchedule();
             updateStats();
             closeModal();
         }
 
+        // 删除作息项
         function deleteItem() {
-            if (!currentEditId || !confirm('确定删除吗？')) return;
+            if (!currentEditId || !confirm('确定删除该作息项吗？')) return;
             const dateKey = formatDate(currentDate);
             schedules[dateKey] = schedules[dateKey].filter(i => i.id !== currentEditId);
             saveData();
@@ -439,7 +542,3 @@
     </script>
 </body>
 </html>
-
-
-
-
