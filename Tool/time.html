@@ -1,39 +1,39 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极简作息管理工具</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .time-grid { grid-template-rows: repeat(24, minmax(20px, 1fr)); }
-            .time-label { @apply text-xs text-gray-500 flex items-center justify-center h-6; }
-            .time-slot { @apply border-t border-gray-200 relative; }
-            .time-block { 
-                @apply absolute left-2 right-2 rounded-md shadow cursor-pointer overflow-hidden z-10;
-                max-height: calc(100% - 4px);
-                overflow: hidden;
-            }
-            .time-block:hover { @apply shadow-md z-20; }
-        }
-    </style>
-    <style>
-        /* 统计模块样式 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            background: white;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .stat-item {
-            display: flex;
-            flex-direction: column;
+！doctypedoctype<风格类型=<元字符集="UTF-8">-8">="元字符集="utf-8">"元字符集="元字符集="utf-8"><"text/tailwindcss">"text/tailwindcss"风格类型="text/tailwindcss">风格类型="text/tailwindcss">"text/tailwindcss"风格类型"text/tailwindcss""text/tailwindcss"风格类型="text/tailwindcss">风格类型="text/tailwindcss">"text/tailwindcss"风格类型"text/tailwindcss""text/tailwindcss"风格类型"text/tailwindcss""text/tailwindcss"风格类型=风格类型="text/tailwindcss">"text/tailwindcss"风格类型="text/tailwindcss">风格类型="text/tailwindcss">"text/tailwindcss"风格类型"text/tailwindcss"
+>头<<8">
+朗
+<风格类型
+风格
+>
+<<风格><风格>风格><风格><>风格><风格>>>风格>风格><>风格<>风格>>风格<<风格>"><元字符集="风格>风格><风格><>风格><风格>>>风格>风格><>风格<>风格>>风格<
+元字符集
+<元字符集<脚本src="=https://cdn.jsDelivr.net/npm/chart.js@4.4.8/dist/chart.UMD.min.js"
+最大高度：计算值
+.时间-网格{网格-模板-行：重复(24，最小最大(20px，1FR))；}{网格-模板-行：重复(24，最小最大(20px，1FR))；}
+https://cdn.jsDelivr.net/npm/chart.js@4.48/dist/chart.UMD.min.JS"></脚本><脚本src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></脚HTTPS://cdn.jsDelivr.net/npm/Chart.JS@4.4.8/dist/chart.UMD.min.js本>https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=1脚本><脚本src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=0"></脚本>https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=1脚本src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=0 https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=1"https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=1><HTTPS：//cdn.jsDelivr.net/npm/chart.js@4。4.8/距离/图表UMD最小JSRC=1 https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=3src=0脚本><脚本src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=0"></脚本></脚本><脚本HTTPS://cdn.jsDelivr.net/npm/chart.js@4.4.8/距离/图表UMD最小值JSRC=3src="n N-4 https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=0"></脚本>="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=0">https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js-0 https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js-0 https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js-0脚本>https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.jsrc=3src=1脚本https://c
+.时间-块
+最大高度：计算值
+chart.js@4{{{{.js@4{{{{
+@施用绝对左-2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；2右-2圆角-眺阴影光标-指针溢出-隐藏Z-10；
+最大高度：计算值(100%-4PX(100%-4pX(100%-4PX(100%-4pX(100%-4PX(100%-4pX(100%-4pX)；
+溢出：隐藏；
+}
+.时间-块：悬停{@申请影子-钔Z-20；}
+}
+风格
+风格
+/* 统计模块样式 */
+.统计网格{统计网格{
+显示：网格；
+网格模板列：重复(2，1Fr)；(>2.1Fr)；"text/tailwindcss"类型
+间隙：12px；
+背景：白色；
+填充：16px；
+边界半径：8px；
+箱形阴影
+        
+.
+显示：柔性；
+弯曲方向：立柱；
             align-items: center;
             padding: 8px 0;
         }
@@ -568,3 +568,4 @@
     </script>
 </body>
 </html>
+
