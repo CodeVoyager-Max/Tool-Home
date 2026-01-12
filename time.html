@@ -344,7 +344,10 @@
             document.getElementById('work-time').textContent = `${(timeMap.work/60).toFixed(1)}小时`;
             document.getElementById('exercise-time').textContent = `${(timeMap.exercise/60).toFixed(1)}小时`;
             document.getElementById('leisure-time').textContent = `${(timeMap.leisure/60).toFixed(1)}小时`;
-        }
+            document.getElementById('study-time').textContent = `${(timeMap.study/60).toFixed(1)}小时`;
+            document.getElementById('other-time').textContent  = `${(timeMap.other/60).toFixed(1)}小时`;
+
+ 
 
         function bindEvents() {
             document.getElementById('prev-date').addEventListener('click', () => changeDate(-1));
@@ -436,5 +439,6 @@
     </script>
 </body>
 </html>
+
 
 
