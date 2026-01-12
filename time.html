@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>极简作息管理工具</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+<style type="text/tailwindcss">
+
+@layer utilities {
+
+.time-grid { grid-template-rows: repeat(24, minmax(20px, 1fr)); }
+
+.time-label { @apply text-xs text-gray-500 flex items-center justify-center h-6; }
+
+.time-slot { @apply border-t border-gray-200 relative; }
+
+.time-block { 
+
+@apply absolute left-2 right-2 rounded-md shadow cursor-pointer overflow-hidden z-10;
+
+max-height: calc(100% - 4px);
+
+overflow: hidden;
+
+}
+
+.time-block:hover { @apply shadow-md z-20; }
+
+}
+
+</style>
+
+<style>
+
+/* 统计模块样式 */
+
+.stats-grid {
+
+display: grid;
+
+grid-template-columns: repeat(2, 1fr);
+
+gap: 12px;
+
+background: white;
+
+padding: 16px;
+
+border-radius: 8px;
+
+box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+}
+
+.stat-item {
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+padding: 8px 0;
+
+}
+
+.stat-item label {
+
+font-size: 14px;
+
+color: #6b7280;
+
+margin-bottom: 4px;
+
+}
+
+.stat-item value {
+
+font-size: 18px;
+
+font-weight: 600;
+
+color: #1f2937;
+
+}
+
+.stat-item span {
+
+font-size: 12px;
+
+color: #9ca3af;
+
+margin-left: 4px;
+
+}
+
+/* 图表容器样式 */
+
+.chart-container {
+
+background: white;
+
+padding: 16px;
+
+border-radius: 8px;
+
+box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+height: 220px;
+
+}
+
+/* 响应式适配 */
+
+@media (min-width: 1024px) {
+
+.stats-grid {
+
+grid-template-columns: repeat(3, 1fr);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body class="bg-gray-50 font-sans min-h-screen pb-20">
+
+<nav class="bg-white shadow-sm sticky top-0 z-40">
+
+<div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+
+<div class="flex items-center">
+
+<i class="fa fa-calendar-check-o text-2xl text-blue-500 mr-2"></i>
+
+<span class="text-xl font-bold text-gray-800">极简作息管理</span>
+
+</div>
+
+<span id="current-date" class="text-gray-600 max-w-[200px] truncate"></span>
+
+</div>
+
+</nav>
+
+<div class="bg-white shadow-sm sticky top-14 z-40">
+
+<div class="max-w-6xl mx-auto px-4 py-2 flex justify-center items-center gap-4">
+
+<button id="prev-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
+
+<i class="fa fa-chevron-left text-gray-600"></i>
+
+</button>
+
+<button id="today-btn" class="px-4 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+
+今日
+
+</button>
+
+<button id="next-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
+
+<i class="fa fa-chevron-right text-gray-600"></i>
+
+</button>
+
+</div>
+
+</div>
+
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+<div class="flex flex-col lg:flex-row gap-8">
+
+<!-- 时间轴区域 -->
+
+<div class="w-full lg:w-[calc(75%-2rem)]">
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden h-[600px]">
+
+<div class="p-3 h-full overflow-hidden">
+
+<div class="flex h-full">
+
+<div class="w-16 flex-shrink-0">
+
+<div class="time-grid grid h-full" id="time-labels"></div>
+
+</div>
+
+<div class="flex-grow overflow-hidden">
+
+<div id="time-axis" class="time-grid grid relative h-full w-full"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- 功能侧边栏 -->
+
+<div class="w-full lg:w-[calc(25%-2rem)] space-y-5">
+
+<button id="add-btn" class="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center">
+
+<i class="fa fa-plus mr-2"></i> 添加作息
+
+</button>
+
+<!-- 图表容器 -->
+
+<div class="chart-container">
+
+<canvas id="time-chart"></canvas>
+
+</div>
+
+<!-- 统计模块 -->
+
+<div class="stats-grid">
+
+<div class="stat-item">
+
+<label>睡眠</label>
+
+<value id="sleep-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+<div class="stat-item">
+
+<label>工作</label>
+
+<value id="work-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+<div class="stat-item">
+
+<label>学习</label>
+
+<value id="study-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+<div class="stat-item">
+
+<label>运动</label>
+
+<value id="exercise-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+<div class="stat-item">
+
+<label>休闲</label>
+
+<value id="leisure-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+<div class="stat-item">
+
+<label>其他</label>
+
+<value id="other-time">0.0</value>
+
+<span>/小时</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- 弹窗表单 -->
+
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+
+<div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-5">
+
+<div class="flex justify-between items-center mb-4">
+
+<h3 id="modal-title" class="text-xl font-bold text-gray-800">添加作息项</h3>
+
+<button id="close-modal" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+
+<i class="fa fa-times"></i>
+
+</button>
+
+</div>
+
+<form id="form">
+
+<input type="hidden" id="item-id">
+
+<div class="mb-4">
+
+<label class="block text-sm font-medium text-gray-700 mb-1">标题</label>
+
+<input type="text" id="title" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：睡眠、工作">
+
+</div>
+
+<div class="grid grid-cols-2 gap-3 mb-4">
+
+<div>
+
+<label class="block text-sm font-medium text-gray-700 mb-1">开始时间</label>
+
+<input type="time" id="start-time" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+</div>
+
+<div>
+
+<label class="block text-sm font-medium text-gray-700 mb-1">结束时间</label>
+
+<input type="time" id="end-time" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+</div>
+
+</div>
+
+<div class="mb-4">
+
+<label class="block text-sm font-medium text-gray-700 mb-1">类别</label>
+
+<select id="category" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+<option value="sleep">睡眠</option>
+
+<option value="work">工作</option>
+
+<option value="study">学习</option>
+
+<option value="exercise">运动</option>
+
+<option value="leisure">休闲</option>
+
+<option value="other">其他</option>
+
+</select>
+
+</div>
+
+<div class="flex gap-2" id="btn-group">
+
+<button type="button" id="delete-btn" class="hidden flex-1 bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition-colors">
+
+删除
+
+</button>
+
+<button type="submit" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+
+保存
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script>
+
+let currentDate = new Date();
+
+let schedules = {};
+
+let currentEditId = null;
+
+let timeChart = null;
+
+// 类别配置（颜色+名称映射）
+
+const categories = {
+
+sleep: { color: '#3B82F6', name: '睡眠' },
+
+work: { color: '#F97316', name: '工作' },
+
+study: { color: '#8B5CF6', name: '学习' },
+
+exercise: { color: '#10B981', name: '运动' },
+
+leisure: { color: '#FBBF24', name: '休闲' },
+
+other: { color: '#6B7280', name: '其他' }
+
+};
+
+
+// 页面加载完成后初始化
+
+document.addEventListener('DOMContentLoaded', function() {
+
+loadData();
+
+renderTimeLabels();
+
+updateDateDisplay();
+
+renderSchedule();
+
+initChart();
+
+updateStats();
+
+bindEvents();
+
+});
+
+
+// 生成唯一ID（用于作息项标识）
+
+function generateId() {
+
+return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+
+}
+
+
+// 从本地存储加载数据
+
+function loadData() {
+
+const saved = localStorage.getItem('simple-schedule');
+
+if (saved) {
+
+schedules = JSON.parse(saved);
+
+} else {
+
+// 初始化默认数据（今日+昨日+明日，测试日期切换）
+
+const today = formatDate(currentDate);
+
+const yesterday = formatDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
+
+const tomorrow = formatDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
+
+
+// 今日数据
+
+schedules[today] = [
+
+{ id: generateId(), title: '睡眠', start: '23:00', end: '07:00', category: 'sleep' },
+
+{ id: generateId(), title: '工作', start: '09:00', end: '18:00', category: 'work' },
+
+{ id: generateId(), title: '运动', start: '18:30', end: '19:30', category: 'exercise' },
+
+{ id: generateId(), title: '休闲', start: '20:00', end: '22:00', category: 'leisure' },
+
+{ id: generateId(), title: '学习', start: '19:30', end: '20:30', category: 'study' },
+
+{ id: generateId(), title: '通勤', start: '08:30', end: '09:00', category: 'other' }
+
+];
+
+
+// 昨日数据
+
+schedules[yesterday] = [
+
+{ id: generateId(), title: '睡眠', start: '22:30', end: '07:30', category: 'sleep' },
+
+{ id: generateId(), title: '工作', start: '09:00', end: '17:30', category: 'work' },
+
+{ id: generateId(), title: '学习', start: '19:00', end: '21:00', category: 'study' },
+
+{ id: generateId(), title: '休闲', start: '21:00', end: '22:30', category: 'leisure' }
+
+];
+
+
+// 明日数据
+
+schedules[tomorrow] = [
+
+{ id: generateId(), title: '睡眠', start: '23:30', end: '08:00', category: 'sleep' },
+
+{ id: generateId(), title: '工作', start: '09:30', end: '18:30', category: 'work' },
+
+{ id: generateId(), title: '运动', start: '19:00', end: '20:00', category: 'exercise' },
+
+{ id: generateId(), title: '其他', start: '08:00', end: '09:30', category: 'other' }
+
+];
+
+
+saveData();
+
+}
+
+}
+
+
+// 保存数据到本地存储
+
+function saveData() {
+
+localStorage.setItem('simple-schedule', JSON.stringify(schedules));
+
+}
+
+
+// 格式化日期为YYYY-MM-DD
+
+function formatDate(date) {
+
+return date.toISOString().split('T')[0];
+
+}
+
+
+// 更新顶部日期显示
+
+function updateDateDisplay() {
+
+const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+
+document.getElementById('current-date').textContent = currentDate.toLocaleDateString('zh-CN', options);
+
+}
+
+
+// 渲染左侧时间标签（00:00-23:00）
+
+function renderTimeLabels() {
+
+const container = document.getElementById('time-labels');
+
+container.innerHTML = '';
+
+for (let i = 0; i < 24; i++) {
+
+const label = document.createElement('div');
+
+label.className = 'time-label';
+
+label.textContent = `${i.toString().padStart(2, '0')}:00`;
+
+container.appendChild(label);
+
+}
+
+}
+
+
+// 渲染时间轴上的作息块
+
+function renderSchedule() {
+
+const dateKey = formatDate(currentDate);
+
+const list = schedules[dateKey] || [];
+
+const container = document.getElementById('time-axis');
+
+container.innerHTML = '';
+
+
+// 创建24小时时间槽
+
+for (let i = 0; i < 24; i++) {
+
+const slot = document.createElement('div');
+
+slot.className = 'time-slot';
+
+slot.dataset.hour = i;
+
+container.appendChild(slot);
+
+}
+
+
+// 渲染每个作息项
+
+list.forEach(item => {
+
+const block = createScheduleBlock(item);
+
+container.appendChild(block);
+
+});
+
+}
+
+
+// 创建单个作息块元素（支持跨天显示）
+
+function createScheduleBlock(item) {
+
+const startParts = item.start.split(':').map(Number);
+
+const endParts = item.end.split(':').map(Number);
+
+const startHour = startParts[0];
+
+const startMin = startParts[1];
+
+const endHour = endParts[0];
+
+const endMin = endParts[1];
+
+
+// 处理跨天作息（如23:00-07:00）
+
+if (endHour < startHour || (endHour === startHour && endMin < startMin)) {
+
+// 当天显示部分（从开始时间到24:00）
+
+const todayBlock = document.createElement('div');
+
+todayBlock.className = 'time-block';
+
+todayBlock.dataset.id = item.id + '-today';
+
+
+// 计算位置和高度（基于分钟数占比）
+
+const todayStartPercent = (startHour * 60 + startMin) / 1440 * 100;
+
+const todayHeightPercent = (1440 - (startHour * 60 + startMin)) / 1440 * 100;
+
+
+todayBlock.style.top = `${todayStartPercent}%`;
+
+todayBlock.style.height = `${todayHeightPercent}%`;
+
+todayBlock.style.backgroundColor = categories[item.category].color;
+
+todayBlock.innerHTML = `
+
+<div class="p-2 h-full flex flex-col text-white">
+
+<span class="text-sm font-medium break-all">${item.title}</span>
+
+<span class="text-xs mt-auto">${item.start} - 24:00</span>
+
+</div>
+
+`;
+
+todayBlock.addEventListener('click', () => openEditModal(item));
+
+return todayBlock;
+
+} else {
+
+// 非跨天作息（正常显示）
+
+const startMinutes = startHour * 60 + startMin;
+
+const endMinutes = endHour * 60 + endMin;
+
+const durationMinutes = endMinutes - startMinutes;
+
+const startPercent = startMinutes / 1440 * 100;
+
+const heightPercent = durationMinutes / 1440 * 100;
+
+
+const block = document.createElement('div');
+
+block.className = 'time-block';
+
+block.dataset.id = item.id;
+
+block.style.top = `${startPercent}%`;
+
+block.style.height = `${heightPercent}%`;
+
+block.style.backgroundColor = categories[item.category].color;
+
+block.innerHTML = `
+
+<div class="p-2 h-full flex flex-col text-white">
+
+<span class="text-sm font-medium break-all">${item.title}</span>
+
+<span class="text-xs mt-auto">${item.start} - ${item.end}</span>
+
+</div>
+
+`;
+
+block.addEventListener('click', () => openEditModal(item));
+
+return block;
+
+}
+
+}
+
+
+// 初始化饼图（统计可视化）
+
+function initChart() {
+
+const ctx = document.getElementById('time-chart').getContext('2d');
+
+timeChart = new Chart(ctx, {
+
+type: 'doughnut',
+
+data: {
+
+labels: Object.values(categories).map(c => c.name),
+
+datasets: [{
+
+data: [0, 0, 0, 0, 0, 0],
+
+backgroundColor: Object.values(categories).map(c => c.color),
+
+borderWidth: 0,
+
+hoverOffset: 4
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+maintainAspectRatio: false,
+
+plugins: {
+
+legend: { 
+
+position: 'bottom', 
+
+labels: { 
+
+padding: 15, 
+
+font: { size: 11 },
+
+boxWidth: 12
+
+} 
+
+},
+
+tooltip: {
+
+callbacks: {
+
+label: function(context) {
+
+const value = context.raw;
+
+const hours = (value / 60).toFixed(1);
+
+return `${context.label}: ${hours}小时`;
+
+}
+
+}
+
+}
+
+},
+
+cutout: '60%'
+
+}
+
+});
+
+}
+
+
+// 更新统计数据
+
+function updateStats() {
+
+const dateKey = formatDate(currentDate);
+
+const list = schedules[dateKey] || [];
+
+const timeMap = { sleep:0, work:0, study:0, exercise:0, leisure:0, other:0 };
+
+
+// 计算每个类别的总时长（分钟）
+
+list.forEach(item => {
+
+const s = item.start.split(':').map(Number);
+
+const e = item.end.split(':').map(Number);
+
+let mins = (e[0] * 60 + e[1]) - (s[0] * 60 + s[1]);
+
+if (mins < 0) mins += 1440; // 跨天情况补全1440分钟（24小时）
+
+timeMap[item.category] += mins;
+
+});
+
+
+// 更新饼图数据
+
+timeChart.data.datasets[0].data = Object.keys(timeMap).map(k => timeMap[k]);
+
+timeChart.update();
+
+
+// 更新统计数值显示
+
+document.getElementById('sleep-time').textContent = `${(timeMap.sleep/60).toFixed(1)}`;
+
+document.getElementById('work-time').textContent = `${(timeMap.work/60).toFixed(1)}`;
+
+document.getElementById('study-time').textContent = `${(timeMap.study/60).toFixed(1)}`;
+
+document.getElementById('exercise-time').textContent = `${(timeMap.exercise/60).toFixed(1)}`;
+
+document.getElementById('leisure-time').textContent = `${(timeMap.leisure/60).toFixed(1)}`;
+
+document.getElementById('other-time').textContent = `${(timeMap.other/60).toFixed(1)}`;
+
+}
+
+
+// 绑定所有交互事件（重点修复日期切换）
+
+function bindEvents() {
+
+// 日期切换 - 前一天
+
+document.getElementById('prev-date').addEventListener('click', () => {
+
+currentDate.setDate(currentDate.getDate() - 1);
+
+updateDateDisplay();
+
+renderSchedule();
+
+updateStats();
+
+});
+
+
+// 日期切换 - 后一天
+
+document.getElementById('next-date').addEventListener('click', () => {
+
+currentDate.setDate(currentDate.getDate() + 1);
+
+updateDateDisplay();
+
+renderSchedule();
+
+updateStats();
+
+});
+
+
+// 日期切换 - 回到今日
+
+document.getElementById('today-btn').addEventListener('click', () => {
+
+currentDate = new Date();
+
+updateDateDisplay();
+
+renderSchedule();
+
+updateStats();
+
+});
+
+
+// 弹窗操作
+
+document.getElementById('add-btn').addEventListener('click', openAddModal);
+
+document.getElementById('close-modal').addEventListener('click', closeModal);
+
+document.getElementById('form').addEventListener('submit', saveItem);
+
+document.getElementById('delete-btn').addEventListener('click', deleteItem);
+
+
+// 点击弹窗外部关闭
+
+document.getElementById('modal').addEventListener('click', (e) => {
+
+if (e.target === document.getElementById('modal')) closeModal();
+
+});
+
+}
+
+
+// 打开添加作息弹窗
+
+function openAddModal() {
+
+currentEditId = null;
+
+document.getElementById('modal-title').textContent = '添加作息项';
+
+document.getElementById('item-id').value = '';
+
+document.getElementById('form').reset();
+
+document.getElementById('delete-btn').classList.add('hidden');
+
+document.getElementById('modal').classList.remove('hidden');
+
+document.getElementById('title').focus();
+
+}
+
+
+// 打开编辑作息弹窗
+
+function openEditModal(item) {
+
+currentEditId = item.id;
+
+document.getElementById('modal-title').textContent = '编辑作息项';
+
+document.getElementById('item-id').value = item.id;
+
+document.getElementById('title').value = item.title;
+
+document.getElementById('start-time').value = item.start;
+
+document.getElementById('end-time').value = item.end;
+
+document.getElementById('category').value = item.category;
+
+document.getElementById('delete-btn').classList.remove('hidden');
+
+document.getElementById('modal').classList.remove('hidden');
+
+}
+
+
+// 关闭弹窗
+
+function closeModal() {
+
+document.getElementById('modal').classList.add('hidden');
+
+}
+
+
+// 保存作息项（新增/编辑）
+
+function saveItem(e) {
+
+e.preventDefault();
+
+const title = document.getElementById('title').value.trim();
+
+const start = document.getElementById('start-time').value;
+
+const end = document.getElementById('end-time').value;
+
+const category = document.getElementById('category').value;
+
+
+// 表单验证
+
+if (!title) {
+
+alert('请填写作息标题');
+
+document.getElementById('title').focus();
+
+return;
+
+}
+
+if (!start || !end) {
+
+alert('请选择开始和结束时间');
+
+return;
+
+}
+
+
+const dateKey = formatDate(currentDate);
+
+if (!schedules[dateKey]) schedules[dateKey] = [];
+
+
+// 编辑已有项
+
+if (currentEditId) {
+
+const index = schedules[dateKey].findIndex(i => i.id === currentEditId);
+
+if (index !== -1) {
+
+schedules[dateKey][index] = { id: currentEditId, title, start, end, category };
+
+}
+
+} else {
+
+// 新增项
+
+schedules[dateKey].push({ id: generateId(), title, start, end, category });
+
+}
+
+
+// 保存数据并刷新界面
+
+saveData();
+
+renderSchedule();
+
+updateStats();
+
+closeModal();
+
+}
+
+
+// 删除作息项
+
+function deleteItem() {
+
+if (!currentEditId || !confirm('确定删除该作息项吗？')) return;
+
+const dateKey = formatDate(currentDate);
+
+schedules[dateKey] = schedules[dateKey].filter(i => i.id !== currentEditId);
+
+saveData();
+
+renderSchedule();
+
+updateStats();
+
+closeModal();
+
+}
+
+</script>
+
+</body>
+
+</html>
