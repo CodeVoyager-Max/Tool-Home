@@ -72,7 +72,7 @@
     <nav class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center">
-                <<i class="fa fa-calendar-check-o text-2xl text-blue-500 mr-2"></</i>
+                <i class="fa fa-calendar-check-o text-2xl text-blue-500 mr-2"></i>
                 <span class="text-xl font-bold text-gray-800">极简作息管理</span>
             </div>
             <span id="current-date" class="text-gray-600 max-w-[200px] truncate"></span>
@@ -81,13 +81,13 @@
     <div class="bg-white shadow-sm sticky top-14 z-40">
         <div class="max-w-6xl mx-auto px-4 py-2 flex justify-center items-center gap-4">
             <button id="prev-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <<i class="fa fa-chevron-left text-gray-600"></</i>
+                <i class="fa fa-chevron-left text-gray-600"></i>
             </button>
             <button id="today-btn" class="px-4 py-1 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors">
                 今日
             </button>
             <button id="next-date" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
-                <<i class="fa fa-chevron-right text-gray-600"></</i>
+                <i class="fa fa-chevron-right text-gray-600"></i>
             </button>
         </div>
     </div>
@@ -111,13 +111,13 @@
             <!-- 功能侧边栏 -->
             <div class="w-full lg:w-[calc(25%-2rem)] space-y-5">
                 <button id="add-btn" class="w-full bg-blue-500 text-white py-3 px-4 rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center">
-                    <<i class="fa fa-plus mr-2"></</i> 添加作息
+                    <i class="fa fa-plus mr-2"></i> 添加作息
                 </button>
-                <!-- 图表容器（新增） -->
+                <!-- 图表容器 -->
                 <div class="chart-container">
                     <canvas id="time-chart"></canvas>
                 </div>
-                <!-- 统计模块（修复ID） -->
+                <!-- 统计模块 -->
                 <div class="stats-grid">
                     <div class="stat-item">
                         <label>睡眠</label>
@@ -159,7 +159,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h3 id="modal-title" class="text-xl font-bold text-gray-800">添加作息项</h3>
                 <button id="close-modal" class="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
-                    <<i class="fa fa-times"></</i>
+                    <i class="fa fa-times"></i>
                 </button>
             </div>
             <form id="form">
@@ -238,8 +238,12 @@
             if (saved) {
                 schedules = JSON.parse(saved);
             } else {
-                // 初始化默认数据
+                // 初始化默认数据（今日+昨日+明日，测试日期切换）
                 const today = formatDate(currentDate);
+                const yesterday = formatDate(new Date(currentDate.getTime() - 24 * 60 * 60 * 1000));
+                const tomorrow = formatDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000));
+                
+                // 今日数据
                 schedules[today] = [
                     { id: generateId(), title: '睡眠', start: '23:00', end: '07:00', category: 'sleep' },
                     { id: generateId(), title: '工作', start: '09:00', end: '18:00', category: 'work' },
@@ -248,6 +252,23 @@
                     { id: generateId(), title: '学习', start: '19:30', end: '20:30', category: 'study' },
                     { id: generateId(), title: '通勤', start: '08:30', end: '09:00', category: 'other' }
                 ];
+                
+                // 昨日数据
+                schedules[yesterday] = [
+                    { id: generateId(), title: '睡眠', start: '22:30', end: '07:30', category: 'sleep' },
+                    { id: generateId(), title: '工作', start: '09:00', end: '17:30', category: 'work' },
+                    { id: generateId(), title: '学习', start: '19:00', end: '21:00', category: 'study' },
+                    { id: generateId(), title: '休闲', start: '21:00', end: '22:30', category: 'leisure' }
+                ];
+                
+                // 明日数据
+                schedules[tomorrow] = [
+                    { id: generateId(), title: '睡眠', start: '23:30', end: '08:00', category: 'sleep' },
+                    { id: generateId(), title: '工作', start: '09:30', end: '18:30', category: 'work' },
+                    { id: generateId(), title: '运动', start: '19:00', end: '20:00', category: 'exercise' },
+                    { id: generateId(), title: '其他', start: '08:00', end: '09:30', category: 'other' }
+                ];
+                
                 saveData();
             }
         }
@@ -399,7 +420,7 @@
             });
         }
 
-        // 更新统计数据（修复闭合括号+ID匹配）
+        // 更新统计数据
         function updateStats() {
             const dateKey = formatDate(currentDate);
             const list = schedules[dateKey] || [];
@@ -418,7 +439,7 @@
             timeChart.data.datasets[0].data = Object.keys(timeMap).map(k => timeMap[k]);
             timeChart.update();
 
-            // 更新统计数值显示（与HTML ID对应）
+            // 更新统计数值显示
             document.getElementById('sleep-time').textContent = `${(timeMap.sleep/60).toFixed(1)}`;
             document.getElementById('work-time').textContent = `${(timeMap.work/60).toFixed(1)}`;
             document.getElementById('study-time').textContent = `${(timeMap.study/60).toFixed(1)}`;
@@ -427,11 +448,25 @@
             document.getElementById('other-time').textContent = `${(timeMap.other/60).toFixed(1)}`;
         }
 
-        // 绑定所有交互事件
+        // 绑定所有交互事件（重点修复日期切换）
         function bindEvents() {
-            // 日期切换
-            document.getElementById('prev-date').addEventListener('click', () => changeDate(-1));
-            document.getElementById('next-date').addEventListener('click', () => changeDate(1));
+            // 日期切换 - 前一天
+            document.getElementById('prev-date').addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() - 1);
+                updateDateDisplay();
+                renderSchedule();
+                updateStats();
+            });
+
+            // 日期切换 - 后一天
+            document.getElementById('next-date').addEventListener('click', () => {
+                currentDate.setDate(currentDate.getDate() + 1);
+                updateDateDisplay();
+                renderSchedule();
+                updateStats();
+            });
+
+            // 日期切换 - 回到今日
             document.getElementById('today-btn').addEventListener('click', () => {
                 currentDate = new Date();
                 updateDateDisplay();
@@ -451,14 +486,6 @@
             });
         }
 
-        // 切换日期（前一天/后一天）
-        function changeDate(direction) {
-            currentDate.setDate(currentDate.getDate() + direction);
-            updateDateDisplay();
-            renderSchedule();
-            updateStats();
-        }
-
         // 打开添加作息弹窗
         function openAddModal() {
             currentEditId = null;
@@ -467,7 +494,6 @@
             document.getElementById('form').reset();
             document.getElementById('delete-btn').classList.add('hidden');
             document.getElementById('modal').classList.remove('hidden');
-            // 自动聚焦标题输入框
             document.getElementById('title').focus();
         }
 
