@@ -33,8 +33,44 @@
 </style>
 </head>
 <body>
- <a href="../" style="position: fixed; top: 20px; left: 20px; padding: 8px 16px; background: #52c41a; color: white; text-decoration: none; border-radius: 4px; z-index: 999;">返回导航页</a>
-<div class="app">
+ <a id="moveBtn3" href="../" style="position:fixed;top:20px;left:20px;padding:8px 16px;background:#007bff;color:white;border-radius:4px;text-decoration:none;z-index:9999;cursor:move;-webkit-user-select:none;">
+ 返回导航页
+ </a>
+ <script>
+ var btn = document.getElementById("moveBtn3");
+ var startX, startY, moveX, moveY, currentX, currentY;
+ btn.ontouchstart = btn.onmousedown = function(e){
+   e.preventDefault();
+   if(e.type=="touchstart"){
+     startX = e.touches[0].clientX;
+     startY = e.touches[0].clientY;
+   }else{
+     startX = e.clientX;
+     startY = e.clientY;
+   }
+   currentX = btn.offsetLeft;
+   currentY = btn.offsetTop;
+   document.onmousemove = document.ontouchmove = drag;
+   document.onmouseup = document.ontouchend = stop;
+ }
+ function drag(e){
+   e.preventDefault();
+   if(e.type=="touchmove"){
+     moveX = e.touches[0].clientX - startX;
+     moveX = e.touches[0].clientX - startX;
+     moveY = e.touches[0].clientY - startY;
+   }else{
+     moveX = e.clientX - startX;
+     moveY = e.clientY - startY;
+   }
+   btn.style.left = currentX + moveX + "px";
+   btn.style.top = currentY + moveY + "px";
+ }
+ function stop(){
+   document.onmousemove = null;
+   document.ontouchmove = null;
+ }
+ </script><div class="app">
   <h1>待办清单</h1>
   <div class="input-row">
     <input type="text" id="todo-input" placeholder="输入待办，回车添加">
