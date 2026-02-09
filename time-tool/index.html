@@ -102,6 +102,37 @@ grid-template-columns: repeat(3, 1fr);
    pos1 = pos3 - e.clientX;
    pos2 = pos4 - e.clientY;
    pos3 = e.clientX;
+   pos4 = e.clientY;
+   
+   dragElement.style.top = (dragElement.offsetTop - pos2) + "px";
+   dragElement.style.left = (dragElement.offsetLeft - pos1) + "px";
+   
+   // 保存位置到本地存储
+   localStorage.setItem('navTop', dragElement.style.top);
+   localStorage.setItem('navLeft', dragElement.style.left);
+ }
+ function elementDragTouch(e) {
+   e.preventDefault();
+   const touch = e.touches[0];
+   pos1 = pos3 - touch.clientX;
+   pos2 = pos4 - touch.clientY;
+   pos3 = touch.clientX;
+   pos4 = touch.clientY;
+   
+   dragElement.style.top = (dragElement.offsetTop - pos2) + "px";
+   dragElement.style.left = (dragElement.offsetLeft - pos1) + "px";
+   
+   // 保存位置到本地存储
+   localStorage.setItem('navTop', dragElement.style.top);
+   localStorage.setItem('navLeft', dragElement.style.left);
+ }
+ function closeDragElement() {
+   document.onmouseup = null;
+   document.onmousemove = null;
+   document.ontouchend = null;
+   document.ontouchmove = null;
+ }
+ </script>
   
   <body class="bg-gray-50 font-sans min-h-screen pb-20">
   <a id="dragNav" href="../" 
@@ -571,6 +602,7 @@ closeModal();
 </script>
 </body>
 </html>
+
 
 
 
