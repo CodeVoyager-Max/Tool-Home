@@ -33,11 +33,11 @@
 </style>
 </head>
 <body>
- <a id="moveBtn3" href="../" style="position:fixed;top:20px;left:20px;padding:8px 16px;background:#007bff;color:white;border-radius:4px;text-decoration:none;z-index:9999;cursor:move;-webkit-user-select:none;">
+<a id="moveBtn" href="../" style="position:fixed;top:20px;left:20px;padding:8px 16px;background:#007bff;color:white;border-radius:4px;text-decoration:none;z-index:9999;cursor:move;-webkit-user-select:none;">
  返回导航页
  </a>
  <script>
- var btn = document.getElementById("moveBtn3");
+ var btn = document.getElementById("moveBtn");
  var startX, startY, move = false;
  btn.ontouchstart = btn.onmousedown = function(e){
    startX = e.clientX || e.touches[0].clientX;
@@ -47,7 +47,8 @@
  btn.ontouchmove = btn.onmousemove = function(e){
    var x = e.clientX || e.touches[0].clientX;
    var y = e.clientY || e.touches[0].clientY;
-   if(Math.abs(x-startX)>5 || Math.abs(y-startY)>5){
+   // 这里改成 1，灵敏度最高
+   if(Math.abs(x-startX)>1 || Math.abs(y-startY)>1){
      move = true;
      btn.style.left = (btn.offsetLeft + x - startX) + "px";
      btn.style.top = (btn.offsetTop + y - startY) + "px";
@@ -61,7 +62,7 @@
    }
    move = false;
  };
- </script><div class="app">
+ </script>
   <h1>待办清单</h1>
   <div class="input-row">
     <input type="text" id="todo-input" placeholder="输入待办，回车添加">
