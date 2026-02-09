@@ -310,38 +310,29 @@
  </a>
  <script>
  var btn = document.getElementById("moveBtn2");
- var startX, startY, moveX, moveY, currentX, currentY;
+ var startX, startY, move = false;
  btn.ontouchstart = btn.onmousedown = function(e){
-   e.preventDefault();
-   if(e.type=="touchstart"){
-     startX = e.touches[0].clientX;
-     startY = e.touches[0].clientY;
-   }else{
-     startX = e.clientX;
-     startY = e.clientY;
+   startX = e.clientX || e.touches[0].clientX;
+   startY = e.clientY || e.touches[0].clientY;
+   move = false;
+ };
+ btn.ontouchmove = btn.onmousemove = function(e){
+   var x = e.clientX || e.touches[0].clientX;
+   var y = e.clientY || e.touches[0].clientY;
+   if(Math.abs(x-startX)>5 || Math.abs(y-startY)>5){
+     move = true;
+     btn.style.left = (btn.offsetLeft + x - startX) + "px";
+     btn.style.top = (btn.offsetTop + y - startY) + "px";
+     startX = x;
+     startY = y;
    }
-   currentX = btn.offsetLeft;
-   currentY = btn.offsetTop;
-   document.onmousemove = document.ontouchmove = drag;
-   document.onmouseup = document.ontouchend = stop;
- }
- function drag(e){
-   e.preventDefault();
-   if(e.type=="touchmove"){
-     moveX = e.touches[0].clientX - startX;
-     moveX = e.touches[0].clientX - startX;
-     moveY = e.touches[0].clientY - startY;
-   }else{
-     moveX = e.clientX - startX;
-     moveY = e.clientY - startY;
+ };
+ btn.ontouchend = btn.onmouseup = function(e){
+   if(move){
+     e.preventDefault();
    }
-   btn.style.left = currentX + moveX + "px";
-   btn.style.top = currentY + moveY + "px";
- }
- function stop(){
-   document.onmousemove = null;
-   document.ontouchmove = null;
- }
+   move = false;
+ };
  </script>
     <nav class="bg-[#8B4513] text-white shadow-md">
         <div class="container mx-auto px-4 py-3">
