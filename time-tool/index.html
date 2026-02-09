@@ -80,24 +80,27 @@ grid-template-columns: repeat(3, 1fr);
      dragElement.style.left = savedLeft;
    }
  }
- dragElement.onmousedown = dragMouseDown;
- dragElement.ontouchstart = dragTouchStart;
+ // 鼠标事件
+ dragElement.addEventListener('mousedown', dragMouseDown);
+ document.addEventListener('mousemove', elementDrag);
+ document.addEventListener('mouseup', closeDragElement);
+ // 触摸事件
+ dragElement.addEventListener('touchstart', dragTouchStart, { passive: false });
+ document.addEventListener('touchmove', elementDragTouch, { passive: false });
+ document.addEventListener('touchend', closeDragElement);
  function dragMouseDown(e) {
    e.preventDefault();
    pos3 = e.clientX;
    pos4 = e.clientY;
-   document.onmouseup = closeDragElement;
-   document.onmousemove = elementDrag;
  }
  function dragTouchStart(e) {
    e.preventDefault();
    const touch = e.touches[0];
    pos3 = touch.clientX;
    pos4 = touch.clientY;
-   document.ontouchend = closeDragElement;
-   document.ontouchmove = elementDragTouch;
  }
  function elementDrag(e) {
+   if (e.buttons !== 1) return; // 只在鼠标按下时移动
    e.preventDefault();
    pos1 = pos3 - e.clientX;
    pos2 = pos4 - e.clientY;
@@ -107,7 +110,6 @@ grid-template-columns: repeat(3, 1fr);
    dragElement.style.top = (dragElement.offsetTop - pos2) + "px";
    dragElement.style.left = (dragElement.offsetLeft - pos1) + "px";
    
-   // 保存位置到本地存储
    localStorage.setItem('navTop', dragElement.style.top);
    localStorage.setItem('navLeft', dragElement.style.left);
  }
@@ -122,15 +124,11 @@ grid-template-columns: repeat(3, 1fr);
    dragElement.style.top = (dragElement.offsetTop - pos2) + "px";
    dragElement.style.left = (dragElement.offsetLeft - pos1) + "px";
    
-   // 保存位置到本地存储
    localStorage.setItem('navTop', dragElement.style.top);
    localStorage.setItem('navLeft', dragElement.style.left);
  }
  function closeDragElement() {
-   document.onmouseup = null;
-   document.onmousemove = null;
-   document.ontouchend = null;
-   document.ontouchmove = null;
+   // 重置状态
  }
  </script>
   
@@ -139,9 +137,9 @@ grid-template-columns: repeat(3, 1fr);
     style="position: fixed; top: 20px; left: 20px; 
            padding: 8px 16px; background-color: #007bff; 
            color: white; border-radius: 4px; text-decoration: none;
-           cursor: grab; z-index: 9999;">
+           cursor: grab; z-index: 9999; user-select: none;">
    返回导航页
-  </a>
+ </a>
 <nav class="bg-white shadow-sm sticky top-0 z-40">
 <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center">
@@ -602,6 +600,7 @@ closeModal();
 </script>
 </body>
 </html>
+
 
 
 
