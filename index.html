@@ -5,29 +5,124 @@
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <title>导航页</title>
      <style>
-         /* 极简样式，可根据需求调整 */
+         * {
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+         }
          body {
-             margin: 50px auto;
-             max-width: 300px;
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+             min-height: 100vh;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             padding: 20px;
+         }
+         .container {
+             background: rgba(255, 255, 255, 0.95);
+             backdrop-filter: blur(10px);
+             border-radius: 24px;
+             padding: 40px;
+             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+             max-width: 480px;
+             width: 100%;
              text-align: center;
-             font-family: sans-serif;
          }
-         a {
-             display: block;
-             padding: 15px;
-             margin: 10px 0;
-             background-color: #f0f0f0;
-             color: #333;
+         h1 {
+             color: #2d3748;
+             font-size: 28px;
+             font-weight: 700;
+             margin-bottom: 12px;
+         }
+         .subtitle {
+             color: #718096;
+             font-size: 16px;
+             margin-bottom: 32px;
+         }
+         .tool-grid {
+             display: grid;
+             grid-template-columns: 1fr;
+             gap: 16px;
+         }
+         .tool-card {
+             display: flex;
+             align-items: center;
+             gap: 16px;
+             padding: 20px;
+             background: white;
+             border-radius: 16px;
              text-decoration: none;
-             border-radius: 5px;
+             color: #2d3748;
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+             transition: all 0.3s ease;
          }
-         a:hover {
-             background-color: #e0e0e0;
+         .tool-card:hover {
+             transform: translateY(-4px);
+             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+         }
+         .tool-icon {
+             width: 48px;
+             height: 48px;
+             border-radius: 12px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 24px;
+         }
+         .tool-icon.culture {
+             background: #fff7e6;
+             color: #fa8c16;
+         }
+         .tool-icon.time {
+             background: #e6f7ff;
+             color: #1890ff;
+         }
+         .tool-icon.todo {
+             background: #f0f9f4;
+             color: #52c41a;
+         }
+         .tool-info {
+             text-align: left;
+         }
+         .tool-title {
+             font-size: 18px;
+             font-weight: 600;
+             margin-bottom: 4px;
+         }
+         .tool-desc {
+             font-size: 14px;
+             color: #718096;
          }
      </style>
  </head>
  <body>
-     <a href="./culture/">儒释道文化网站</a>
-     <a href="./time-tool/">时间工具</a>
+     <div class="container">
+         <h1>导航页</h1>
+         <p class="subtitle">探索与效率的集合</p>
+         <div class="tool-grid">
+             <a href="culture/" class="tool-card">
+                 <div class="tool-icon culture">📜</div>
+                 <div class="tool-info">
+                     <div class="tool-title">儒释道文化网站</div>
+                     <div class="tool-desc">探索传统文化智慧</div>
+                 </div>
+             </a>
+             <a href="time-tool/" class="tool-card">
+                 <div class="tool-icon time">⏰</div>
+                 <div class="tool-info">
+                     <div class="tool-title">时间工具</div>
+                     <div class="tool-desc">精准计时、时间转换</div>
+                 </div>
+             </a>
+             <a href="todo-tool/" class="tool-card">
+                 <div class="tool-icon todo">📝</div>
+                 <div class="tool-info">
+                     <div class="tool-title">待办清单</div>
+                     <div class="tool-desc">管理任务，高效完成</div>
+                 </div>
+             </a>
+         </div>
+     </div>
  </body>
  </html>
